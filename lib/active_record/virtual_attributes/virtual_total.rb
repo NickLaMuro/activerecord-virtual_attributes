@@ -122,9 +122,13 @@ module VirtualAttributes
                         else
                           reflection.klass.arel_attribute(column).send(method_name)
                         end
-          query       = query.select(arel_column)
+          query       = t.grouping(Arel::Nodes::SqlLiteral.new(query.select(arel_column).to_sql))
 
-          t.grouping(Arel::Nodes::SqlLiteral.new(query.to_sql))
+          if method_name == :size
+            query
+          else
+            t.grouping(Arel::Nodes::NamedFunction.new('COALESCE', [query, Arel::Nodes::SqlLiteral.new("0")]))
+          end
         end
       end
     end
