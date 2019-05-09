@@ -76,17 +76,18 @@ module VirtualAttributes
           end
         else
           define_method(name) do
-            (attribute_present?(name) ? self[name] : nil) ||
-              begin
-                rel = send(relation)
-                if rel.loaded?
-                  rel.blank? ? nil : rel.map { |t| t.send(column) }.compact.send(method_name)
-                else
-                  # aggregates are not smart enough to handle virtual attributes
-                  arel_column = rel.klass.arel_attribute(column)
-                  rel.try(method_name, arel_column) || 0
-                end
+            if attribute_present?(name)
+              self[name] || nil
+            else
+              rel = send(relation)
+              if rel.loaded?
+                rel.blank? ? nil : rel.map { |t| t.send(column) }.compact.send(method_name)
+              else
+                # aggregates are not smart enough to handle virtual attributes
+                arel_column = rel.klass.arel_attribute(column)
+                rel.try(method_name, arel_column) || 0
               end
+            end
           end
         end
       end
