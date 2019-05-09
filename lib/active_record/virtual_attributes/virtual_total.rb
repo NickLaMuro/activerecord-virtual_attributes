@@ -83,7 +83,7 @@ module VirtualAttributes
               if rel.loaded?
                 rel.map { |t| t.send(column) }.compact.send(method_name)
               else
-                # aggregates are not smart enough to handle virtual attributes
+                # virtual attributes support for aggregates
                 arel_column = rel.klass.arel_attribute(column)
                 rel.try(method_name, arel_column) || 0
               end
