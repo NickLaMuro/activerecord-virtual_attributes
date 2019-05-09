@@ -77,7 +77,7 @@ module VirtualAttributes
         else
           define_method(name) do
             if has_attribute?(name)
-              self[name]
+              self[name] || 0
             else
               rel = send(relation)
               if rel.loaded?
